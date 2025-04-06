@@ -59,6 +59,7 @@ section {
 
 #startBtn:hover {
     background-color: #040f05;
+    color: white;
     cursor: none;
 }
 
