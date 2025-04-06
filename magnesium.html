@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beryllium</title>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars */
+            background-color: black; /* Set background to black */
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row; /* Split screen into two parts */
+            color: white; /* White text */
+            height: 100vh;
+        }
+
+        /* Left Section (Text) */
+        .text-container {
+            width: 50%;
+            padding: 5vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Large Hydrogen Title */
+        .title {
+            font-size: 8vw; /* Very large for magazine look */
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+
+        /* About Hydrogen Section */
+        .info-container {
+            background: rgba(255, 255, 255, 0.1); /* Slightly transparent */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .info-container h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .info-container p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        /* Right Section (3D Model) */
+        .model-container {
+            width: 10%;            /* Adjust width if needed */
+            height: 100%;
+            position: relative;
+            left: -5%;            /* Shift the canvas to the left */
+        }
+
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Next Element Button */
+        .next-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            z-index: 10;
+        }
+
+        .next-button:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Container to hold the buttons at the bottom center */
+        .buttons-container {
+            position: fixed;
+            bottom: 20px; /* Distance from the bottom */
+            left: 30%;
+            transform: translateX(-50%); /* Center the buttons */
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between buttons */
+            z-index: 2;
+        }
+
+        /* Styling for each button */
+        .element-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white; /* White text */
+            padding: 15px 30px; /* Padding for the button */
+            font-size: 24px; /* Font size for the letters */
+            border-radius: 20px; /* Curved edges */
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transition */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Shadow effect */
+        }
+
+        /* Hover effect to enlarge the button */
+        .element-button:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Night Sky Canvas */
+        #starCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind all other elements */
+        }
+
+        .scroll-box {
+        height: 300px;
+        overflow-y: auto;
+        border: 0px solid #ccc; 
+        padding: 10px; 
+        background-color: transparent;
+        position: relative; 
+        z-index: 10;
+        }
+        
+        .scroll-box::-webkit-scrollbar {
+        width: 8px;
+        }
+
+        .scroll-box::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 10px;
+        }
+
+        .scroll-box::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 10px;
+        border: 0px solid #eee;
+        }
+
+        .scroll-box::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+        }
+
+        #transition-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
+      z-index: 9999;
+      pointer-events: none;
+      transform: scale(2);
+      opacity: 0;
+      transition: transform 1s ease, opacity 1s ease;
+      overflow: hidden;
+    }
+
+    /* Stars animation layer */
+    #transition-overlay::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: transparent url("data:image/svg+xml;utf8,\ <svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'>\ <circle cx='5' cy='10' r='1' fill='white'/>\ <circle cx='20' cy='30' r='1.5' fill='white'/>\ <circle cx='40' cy='60' r='1' fill='white'/>\ <circle cx='70' cy='20' r='0.7' fill='white'/>\ <circle cx='90' cy='90' r='1.2' fill='white'/>\ <circle cx='130' cy='40' r='1' fill='white'/>\ <circle cx='160' cy='80' r='1.3' fill='white'/>\ <circle cx='200' cy='50' r='0.8' fill='white'/>\ <circle cx='250' cy='110' r='1.1' fill='white'/>\ <circle cx='300' cy='70' r='1' fill='white'/>\ </svg>") repeat;
+      background-size: 300px 300px;
+      animation: moveStars 60s linear infinite;
+      opacity: 0.6;
+      filter: blur(0.3px);
+    }
+
+    /* Twinkling effect (optional) */
+    #transition-overlay::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(white 1%, transparent 1.5%) center/2px 2px repeat;
+      animation: twinkle 1.5s infinite alternate;
+      opacity: 0.2;
+    }
+
+    @keyframes moveStars {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-200px, -200px); }
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.1; }
+      to { opacity: 0.4; }
+    }
+
+    </style>
+</head>
+<body>
+
+    <div id="transition-overlay"></div>
+
+    <!-- Left Side (Text Content) -->
+    <div class="text-container">
+        <div class="title">MAGNESIUM</div>
+
+        <div class="info-container">
+            <h2>ABOUT MAGNESIUM</h2>
+            <div class="scroll-box">
+                <p><strong>Magnesium</strong>, symbol <strong>Mg</strong>, is a lightweight metal with atomic number <strong>12</strong>. A member of the <strong>alkaline earth metals</strong> in <strong>Group 2</strong>, Magnesium is essential both industrially and biologically — it’s the metal that keeps engines light and chlorophyll molecules functioning in plants.</p>
+
+<p>Magnesium has an atomic mass of about <strong>24.31 u</strong> and an electron configuration of <strong>[Ne] 3s²</strong>. It is in <strong>Period 3</strong> and typically forms stable <strong>Mg²⁺ ions</strong> by losing two electrons. Though reactive, it is more stable than its Group 1 neighbors and burns with a brilliant white flame.</p>
+
+<p>With a <strong>melting point of 650°C (1202°F)</strong> and a <strong>boiling point of 1090°C (1994°F)</strong>, Magnesium is solid at room temperature and has a relatively low <strong>density of 1.738 g/cm³</strong>. It’s often alloyed with aluminum to create lightweight structural materials.</p>
+
+<p>Magnesium is abundant in Earth's crust and is found in minerals like dolomite and magnesite, as well as in seawater. It plays a vital role in human health — being involved in over 300 enzymatic reactions in the body — and is found in green leafy vegetables, nuts, and grains.</p>
+
+<p>The element was first isolated by <strong>Sir Humphry Davy</strong> in 1808. The name “Magnesium” is derived from <em>Magnesia</em>, a region in Thessaly, Greece, where the mineral magnesite was found.</p>
+
+<p><strong>Fun fact:</strong> Magnesium is the central element in the chlorophyll molecule, meaning no photosynthesis — and no plant life — could exist without it.</p>
+
+            </div>
+        </div>
+    </div>
+    <!-- Container for the buttons -->
+        <div class="buttons-container">
+            <button data-target="hydrogen.html" class="element-button" onclick="location.href='hydrogen.html'">H</button>
+            <button data-target="beryllium.html" class="element-button" onclick="location.href='beryllium.html'">Be</button>
+            <button data-target="sodium.html" class="element-button" onclick="location.href='sodium.html'">Na</button>
+            <button data-target="magnesium.html" class="element-button" onclick="location.href='magnesium.html'">Mg</button>
+            <button data-target="lithium.html" class="element-button" onclick="location.href='lithium.html'">Li</button>
+        </div>
+
+
+    <!-- Right Side (3D Model) -->
+    <div class="model-container"></div>
+
+    <!-- Next Element Button -->
+    <button class="next-button" onclick="nextElement()">Start Quiz</button>
+
+    <canvas id="starCanvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+
+const overlay = document.getElementById('transition-overlay');
+
+    // Zoom-out effect when entering the page
+    window.addEventListener('DOMContentLoaded', () => {
+      overlay.style.opacity = '0';
+      overlay.style.transform = 'scale(2)';
+    });
+
+    // Handle button clicks for navigation
+    document.querySelectorAll('button[data-target]').forEach(button => {
+      button.addEventListener('click', function () {
+        const target = this.getAttribute('data-target');
+        overlay.style.opacity = '1';
+        overlay.style.transform = 'scale(1)'; // zoom in
+        setTimeout(() => {
+          window.location.href = target;
+        }, 1000); // wait for transition
+      });
+    });
+
+
+        // Night Sky Background (Flickering Stars)
+        const canvas = document.getElementById("starCanvas");
+        const ctx = canvas.getContext("2d");
+        let stars = [];
+        const numberOfStars = 1000;
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Create random stars
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < numberOfStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5, // Random size of stars
+                    alpha: Math.random() * 0.6 + 0.4, // Random opacity for flickering effect
+                    speed: Math.random() * 0.5 + 0.2 // Random speed for flickering effect
+                });
+            }
+        }
+
+        // Draw the stars
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+                star.alpha += (Math.random() - 0.5) * star.speed; // Randomly adjust opacity for flickering
+                if (star.alpha < 0.2) star.alpha = 0.2;
+                if (star.alpha > 1) star.alpha = 1;
+            });
+        }
+
+        // Update canvas size on window resize
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createStars();
+        });
+
+        // Animation loop
+        function animateStars() {
+            drawStars();
+            requestAnimationFrame(animateStars);
+        }
+
+        createStars();
+        animateStars();
+// Example of how to dynamically create buttons (optional)
+
+        // Create the scene
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000, 0); // Set black background
+
+// Create the renderer
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth * 0.5, window.innerHeight); // Set the canvas size (model in right half)
+document.querySelector(".model-container").appendChild(renderer.domElement);
+renderer.setClearColor(0x000000, 0); // The second parameter (0) controls the opacity (0 is fully transparent)
+
+// Create the camera
+const camera = new THREE.PerspectiveCamera(75, (window.innerWidth * 0.5) / window.innerHeight, 0.1, 1000); 
+camera.position.set(0, 50, 20); // X is -50 to move the camera to the left, Y and Z can stay the same
+
+// Update on window resize
+window.addEventListener('resize', () => {
+    const width = window.innerWidth * 0.5;
+    const height = window.innerHeight;
+    renderer.setSize(width, height);
+
+    camera.aspect = width / height; // Update the aspect ratio
+    camera.updateProjectionMatrix(); // Apply the changes to the camera
+});
+
+// Add lights from all directions
+const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+scene.add(ambientLight);
+
+const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x888888, 2);
+scene.add(hemisphereLight);
+
+const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight1.position.set(10, 10, 10);
+scene.add(directionalLight1);
+
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight2.position.set(-10, 10, 10);
+scene.add(directionalLight2);
+
+const directionalLight3 = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight3.position.set(10, -10, -10);
+scene.add(directionalLight3);
+
+const directionalLight4 = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight4.position.set(-10, -10, 10);
+scene.add(directionalLight4);
+
+// Load the GLTF model
+const loader = new THREE.GLTFLoader();
+let mixer;  // Variable to hold the animation mixer
+
+loader.load('models/magnesiumreal.glb', function (gltf) {
+    const model = gltf.scene;
+    model.scale.set(1, 1, 1);
+    model.position.set(0, 0, 0);
+    scene.add(model);
+
+    // Check if there are animations
+    if (gltf.animations && gltf.animations.length) {
+        // Create an animation mixer
+        mixer = new THREE.AnimationMixer(model);
+        
+        // Play the first animation in the model
+        gltf.animations.forEach((clip) => {
+            mixer.clipAction(clip).play();
+        });
+    }
+}, undefined, function (error) {
+    console.error("Error loading model:", error);
+});
+
+// Orbit Controls (Restrict to zoom & rotate only)
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // Smooth controls
+controls.dampingFactor = 0.05;
+controls.enableZoom = true; // Allow zooming
+controls.enableRotate = true; // Allow rotating
+controls.enablePan = false; // Disable panning (right-click dragging)
+controls.screenSpacePanning = false; // Ensure no movement on right-click
+
+// Optional: Restrict zoom range
+controls.minDistance = 1; // Minimum zoom distance
+controls.maxDistance = 100; // Maximum zoom distance
+
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+
+    // Update the animation mixer
+    if (mixer) {
+        mixer.update(0.01);  // You can adjust the delta time for smoother animation
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+animate();
+
+// Adjust canvas on resize
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth * 0.5, window.innerHeight);
+    camera.aspect = (window.innerWidth * 0.5) / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
+
+
+        // Redirect to next element page
+        function nextElement() {
+            window.location.href = 'lithium.html';
+        }
+    </script>
+
+</body>
+</html>

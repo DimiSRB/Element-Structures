@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elementenwebsite</title>
+    <link rel="stylesheet" href="css/frontpage.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/STLLoader.js"></script>
+    <style>
+         #transition-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%);
+      z-index: 9999;
+      pointer-events: none;
+      transform: scale(2);
+      opacity: 0;
+      transition: transform 1s ease, opacity 1s ease;
+      overflow: hidden;
+    }
+
+    /* Stars animation layer */
+    #transition-overlay::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: transparent url("data:image/svg+xml;utf8,\ <svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'>\ <circle cx='5' cy='10' r='1' fill='white'/>\ <circle cx='20' cy='30' r='1.5' fill='white'/>\ <circle cx='40' cy='60' r='1' fill='white'/>\ <circle cx='70' cy='20' r='0.7' fill='white'/>\ <circle cx='90' cy='90' r='1.2' fill='white'/>\ <circle cx='130' cy='40' r='1' fill='white'/>\ <circle cx='160' cy='80' r='1.3' fill='white'/>\ <circle cx='200' cy='50' r='0.8' fill='white'/>\ <circle cx='250' cy='110' r='1.1' fill='white'/>\ <circle cx='300' cy='70' r='1' fill='white'/>\ </svg>") repeat;
+      background-size: 300px 300px;
+      animation: moveStars 60s linear infinite;
+      opacity: 0.6;
+      filter: blur(0.3px);
+    }
+
+    /* Twinkling effect (optional) */
+    #transition-overlay::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(white 1%, transparent 1.5%) center/2px 2px repeat;
+      animation: twinkle 1.5s infinite alternate;
+      opacity: 0.2;
+    }
+
+    @keyframes moveStars {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(-200px, -200px); }
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.1; }
+      to { opacity: 0.4; }
+    }
+
+    </style>
+</head>
+<body>
+    <div id="transition-overlay"></div>
+
+    <canvas id="moleculeCanvas"></canvas>
+    <div class="circle"></div>
+    <div class="container">
+        <section id="home">
+            <h1>The Quest of the Five Elements</h1>
+            <button id="startBtn">Start Your Journey</button>
+        </section>
+    </div>
+    
+    <div id="atom-container"></div>
+    <script src="javascript/frontpage.js"></script>
+    <script>
+        const overlay = document.getElementById('transition-overlay');
+
+// Zoom-out effect when entering the page
+window.addEventListener('DOMContentLoaded', () => {
+  overlay.style.opacity = '0';
+  overlay.style.transform = 'scale(2)';
+});
+
+// Handle button clicks for navigation
+document.querySelectorAll('button[data-target]').forEach(button => {
+  button.addEventListener('click', function () {
+    const target = this.getAttribute('data-target');
+    overlay.style.opacity = '1';
+    overlay.style.transform = 'scale(1)'; // zoom in
+    setTimeout(() => {
+      window.location.href = target;
+    }, 1000); // wait for transition
+  });
+});
+    </script>
+</body>
+</html>
