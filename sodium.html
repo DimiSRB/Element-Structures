@@ -336,7 +336,7 @@ const overlay = document.getElementById('transition-overlay');
 
         // Create the scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000, 0); // Set black background
+scene.background = null;
 
 // Create the renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });

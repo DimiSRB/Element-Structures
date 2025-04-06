@@ -262,8 +262,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
-        const overlay = document.getElementById('transition-overlay');
-
 // Zoom-out effect when entering the page
 window.addEventListener('DOMContentLoaded', () => {
   overlay.style.opacity = '0';
@@ -274,6 +272,7 @@ window.addEventListener('DOMContentLoaded', () => {
 document.querySelectorAll('button[data-target]').forEach(button => {
   button.addEventListener('click', function () {
     const target = this.getAttribute('data-target');
+    const overlay = document.getElementById('transition-overlay');
     overlay.style.opacity = '1';
     overlay.style.transform = 'scale(1)'; // zoom in
     setTimeout(() => {
@@ -340,7 +339,7 @@ document.querySelectorAll('button[data-target]').forEach(button => {
 
         // Create the scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000, 0); // Set black background
+scene.background = null;
 
 // Create the renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
