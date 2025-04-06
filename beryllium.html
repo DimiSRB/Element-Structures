@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beryllium</title>
+    <link rel="stylesheet" href="css/cursor.css">
     <style>
         /* General styles */
         body {
@@ -15,6 +16,7 @@
             flex-direction: row; /* Split screen into two parts */
             color: white; /* White text */
             height: 100vh;
+            cursor: none;
         }
 
         /* Left Section (Text) */
@@ -82,7 +84,7 @@
             font-size: 1.2em;
             border: none;
             border-radius: 8px;
-            cursor: pointer;
+            cursor: none;
             transition: background 0.3s ease, transform 0.2s ease;
             z-index: 10;
         }
@@ -111,7 +113,7 @@
             padding: 15px 30px; /* Padding for the button */
             font-size: 24px; /* Font size for the letters */
             border-radius: 20px; /* Curved edges */
-            cursor: pointer;
+            cursor: none;
             transition: all 0.3s ease; /* Smooth transition */
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Shadow effect */
         }
@@ -163,7 +165,7 @@
     </style>
 </head>
 <body>
-
+    <div class="circle"></div>
     <!-- Left Side (Text Content) -->
     <div class="text-container">
         <div class="title">BERYLLIUM</div>
@@ -210,6 +212,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="javascript/cursor.js"></script>
     <script>
 
         // Night Sky Background (Flickering Stars)
